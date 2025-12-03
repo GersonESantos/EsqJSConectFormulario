@@ -1,29 +1,3 @@
-
-### o meu objetivo é aprender a usar o copilot
-quero fazer um api crud
-conectou ok da mensagem não conectou mensagem
-stack: JavaScript + HTML + CSS + sql2
-dados do banco de dados:
-    host: 'localhost', 
-    user: 'root',
-    password: 'Gabibi89*',
-    port: 3306,
-    database: 'formulario'
-Table: usuarios
-Columns:
-idusuarios int AI PK 
-nome varchar(45) 
-email varchar(110) 
-telefone varchar(15) 
-sexo varchar(15) 
-data_nasc date 
-senha varchar(45) 
-cidade varchar(45) 
-estado varchar(45) 
-endereco varchar(45)
-parar aqui para explicar
-
-css:
 /* 
   Variáveis para cores:
   */
@@ -300,7 +274,3 @@ footer a:hover {
     text-decoration: underline;
     color: var(--destaque-inverso);
 }
-
-    
-    
-    

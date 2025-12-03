@@ -1,153 +1,176 @@
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('Script carregado v2.0');
-    loadUsers();
+// --- 1. Lógica de Troca de Tema (Claro/Escuro) ---
+
+const botao = document.getElementById('botao-tema');
+const body = document.body;
+
+// Persistência do tema: verifica o localStorage ao carregar
+const temasalvo = localStorage.getItem('tema');
+// Chama a função para aplicar o tema salvo (se existir)
+if (temasalvo) {
+    temaEscuro(temasalvo === 'escuro');
+} else {
+    // Aplica o tema padrão se não houver tema salvo (ex: claro)
+    temaEscuro(false); 
+}
+
+// Função para aplicar/remover a classe 'escuro' e trocar o ícone
+function temaEscuro(tipo) {
+    if (tipo === true) {
+        body.classList.add('escuro');
+        // Ícone Sol (Font Awesome)
+        botao.innerHTML = '<i class="fa-solid fa-sun"></i>';
+    } else {
+        body.classList.remove('escuro');
+        // Ícone Lua (Font Awesome)
+        botao.innerHTML = '<i class="fa-solid fa-moon"></i>';
+    }
+}
+
+// Evento de clique para alternar o tema
+botao.addEventListener('click', () => {
+    // Alterna a classe 'escuro' e retorna se ela está presente
+    const isescuro = body.classList.toggle('escuro'); 
+    temaEscuro(isescuro);
+    localStorage.setItem('tema', isescuro ? 'escuro' : 'claro');
 });
 
-document.getElementById('cadastroForm').addEventListener('submit', function (event) {
-    event.preventDefault();
+// --- 2. Lógica CRUD (Cadastro, Listagem, Edição, Exclusão) ---
 
-    const formData = new FormData(event.target);
-    const data = Object.fromEntries(formData.entries());
-    const id = data.idusuarios;
+const cadastroForm = document.getElementById('cadastroForm');
+const usuariosContainer = document.getElementById('usuarios-container');
+const mensagemDiv = document.getElementById('mensagem');
+// Carrega os usuários salvos, ou um array vazio se for a primeira vez
+let usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
 
-    let url = 'http://localhost:3000/api/usuarios';
-    let method = 'POST';
+// Evento de envio do formulário (Salvar/Atualizar)
+cadastroForm.addEventListener('submit', function(e) {
+    e.preventDefault();
 
-    if (id) {
-        url = `http://localhost:3000/api/usuarios/${id}`;
-        method = 'PUT';
+    const idusuarios = document.getElementById('idusuarios').value;
+    const novoUsuario = {
+        id: idusuarios || Date.now().toString(), // Novo ID ou ID existente
+        nome: document.getElementById('nome').value,
+        email: document.getElementById('email').value,
+        telefone: document.getElementById('telefone').value,
+        sexo: document.getElementById('sexo').value,
+        data_nasc: document.getElementById('data_nasc').value,
+        senha: document.getElementById('senha').value,
+        cidade: document.getElementById('cidade').value,
+        estado: document.getElementById('estado').value,
+        endereco: document.getElementById('endereco').value
+    };
+
+    if (idusuarios) {
+        // MODO EDIÇÃO: Atualiza o usuário
+        const index = usuarios.findIndex(u => u.id === idusuarios);
+        if (index !== -1) {
+            usuarios[index] = novoUsuario;
+            mensagemDiv.textContent = 'Usuário atualizado com sucesso!';
+        }
+    } else {
+        // MODO CADASTRO: Adiciona novo usuário
+        usuarios.push(novoUsuario);
+        mensagemDiv.textContent = 'Usuário cadastrado com sucesso!';
+    }
+    
+    // Salva a lista atualizada no localStorage e limpa o formulário
+    localStorage.setItem('usuarios', JSON.stringify(usuarios));
+    cadastroForm.reset();
+    document.getElementById('idusuarios').value = ''; 
+    renderizarUsuarios(); // Atualiza a lista na tela
+});
+
+// Função para desenhar a lista de usuários na tela (Onde os botões são criados)
+function renderizarUsuarios() {
+    if (usuarios.length === 0) {
+        usuariosContainer.innerHTML = '<p>Nenhum usuário cadastrado.</p>';
+        return;
     }
 
-    fetch(url, {
-        method: method,
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    })
-        .then(response => {
-            if (response.ok) {
-                return response.json();
-            } else {
-                throw new Error('Erro na requisição');
-            }
-        })
-        .then(data => {
-            const mensagemDiv = document.getElementById('mensagem');
-            mensagemDiv.textContent = id ? 'Usuário atualizado com sucesso!' : 'Usuário cadastrado com sucesso!';
-            mensagemDiv.style.color = 'green';
-            event.target.reset();
-            document.getElementById('idusuarios').value = ''; // Limpar ID oculto
-            loadUsers(); // Recarregar a lista
-        })
-        .catch(error => {
-            console.error('Erro:', error);
-            const mensagemDiv = document.getElementById('mensagem');
-            mensagemDiv.textContent = 'Erro ao salvar usuário. Verifique o console.';
-            mensagemDiv.style.color = 'red';
-        });
-});
-
-function loadUsers() {
-    fetch('http://localhost:3000/api/usuarios')
-        .then(response => response.json())
-        .then(users => {
-            console.log('Usuários carregados:', users);
-            // alert('Carregando ' + users.length + ' usuários na lista.'); // Debug
-            const container = document.getElementById('usuarios-container');
-            container.innerHTML = '';
-
-            if (users.length === 0) {
-                container.innerHTML = '<p>Nenhum usuário cadastrado.</p>';
-                return;
-            }
-
-            const table = document.createElement('table');
-            table.style.width = '100%';
-            table.style.borderCollapse = 'collapse';
-            table.innerHTML = `
-            <thead>
-                <tr style="background-color: var(--destaque); color: var(--texto-inverso);">
-                    <th style="padding: 10px; text-align: left;">ID</th>
-                    <th style="padding: 10px; text-align: left;">Nome</th>
-                    <th style="padding: 10px; text-align: left;">Email</th>
-                    <th style="padding: 10px; text-align: center;">Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        `;
-
-            const tbody = table.querySelector('tbody');
-            users.forEach(user => {
-                const tr = document.createElement('tr');
-                tr.style.borderBottom = '1px solid #ddd';
-                tr.innerHTML = `
-                <td style="padding: 10px;">${user.idusuarios}</td>
-                <td style="padding: 10px;">${user.nome}</td>
-                <td style="padding: 10px;">${user.email}</td>
-                <td style="padding: 10px; text-align: center;">
-                    <button onclick="editUser(${user.idusuarios})" style="margin-right: 5px; padding: 5px 10px; background-color: #ffc107; border: none; border-radius: 4px; cursor: pointer;">Editar</button>
-                    <button onclick="deleteUser(${user.idusuarios})" style="padding: 5px 10px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">Excluir</button>
+    let html = '<table><thead><tr><th>Nome</th><th>Email</th><th>Ações</th></tr></thead><tbody>';
+    
+    usuarios.forEach(usuario => {
+        html += `
+            <tr>
+                <td>${usuario.nome}</td>
+                <td>${usuario.email}</td>
+                <td>
+                    <button class="btn-editar" data-id="${usuario.id}">Editar</button>
+                    <button class="btn-excluir" data-id="${usuario.id}">Excluir</button>
                 </td>
-            `;
-                tbody.appendChild(tr);
-            });
+            </tr>
+        `;
+    });
+    
+    html += '</tbody></table>';
+    usuariosContainer.innerHTML = html;
 
-            container.appendChild(table);
-        })
-})
-        .catch (error => {
-    console.error('Erro ao carregar usuários:', error);
-    alert('Erro ao carregar lista de usuários: ' + error.message);
-});
+    // Associa as funções aos botões DEPOIS de eles serem inseridos no DOM
+    document.querySelectorAll('.btn-editar').forEach(button => {
+        button.addEventListener('click', editarUsuario);
+    });
+    document.querySelectorAll('.btn-excluir').forEach(button => {
+        button.addEventListener('click', excluirUsuario);
+    });
 }
 
-function editUser(id) {
-    fetch(`http://localhost:3000/api/usuarios`) // Na prática ideal seria buscar apenas um, mas vamos filtrar da lista ou buscar todos
-        .then(response => response.json())
-        .then(users => {
-            const user = users.find(u => u.idusuarios === id);
-            if (user) {
-                document.getElementById('idusuarios').value = user.idusuarios;
-                document.getElementById('nome').value = user.nome;
-                document.getElementById('email').value = user.email;
-                document.getElementById('telefone').value = user.telefone;
-                document.getElementById('sexo').value = user.sexo;
-                // Formatar data para YYYY-MM-DD se necessário
-                if (user.data_nasc) {
-                    const date = new Date(user.data_nasc);
-                    const formattedDate = date.toISOString().split('T')[0];
-                    document.getElementById('data_nasc').value = formattedDate;
-                }
-                document.getElementById('senha').value = user.senha;
-                document.getElementById('cidade').value = user.cidade;
-                document.getElementById('estado').value = user.estado;
-                document.getElementById('endereco').value = user.endereco;
+// Função para preencher o formulário no modo de edição
+function editarUsuario(e) {
+    const id = e.target.getAttribute('data-id');
+    const usuarioParaEditar = usuarios.find(u => u.id === id);
 
-                document.getElementById('mensagem').textContent = 'Editando usuário ' + id;
-                document.getElementById('mensagem').style.color = 'blue';
-            }
-        });
-}
-
-function deleteUser(id) {
-    if (confirm('Tem certeza que deseja excluir este usuário?')) {
-        fetch(`http://localhost:3000/api/usuarios/${id}`, {
-            method: 'DELETE'
-        })
-            .then(response => {
-                if (response.ok) {
-                    loadUsers();
-                    alert('Usuário excluído com sucesso!');
-                } else {
-                    alert('Erro ao excluir usuário.');
-                }
-            })
-            .catch(error => console.error('Erro:', error));
+    if (usuarioParaEditar) {
+        // Preenche o campo oculto idusuarios para indicar o modo edição
+        document.getElementById('idusuarios').value = usuarioParaEditar.id; 
+        
+        // Preenche os outros campos
+        document.getElementById('nome').value = usuarioParaEditar.nome;
+        document.getElementById('email').value = usuarioParaEditar.email;
+        document.getElementById('telefone').value = usuarioParaEditar.telefone;
+        document.getElementById('sexo').value = usuarioParaEditar.sexo;
+        document.getElementById('data_nasc').value = usuarioParaEditar.data_nasc;
+        document.getElementById('senha').value = usuarioParaEditar.senha;
+        document.getElementById('cidade').value = usuarioParaEditar.cidade;
+        document.getElementById('estado').value = usuarioParaEditar.estado;
+        document.getElementById('endereco').value = usuarioParaEditar.endereco;
+        
+        mensagemDiv.textContent = 'Modo de Edição ativado. Altere os campos e clique em Salvar.';
     }
 }
 
-// Expor funções para o escopo global para o onclick funcionar
-window.editUser = editUser;
-window.deleteUser = deleteUser;
+// Função de Exclusão
+function excluirUsuario(e) {
+    const id = e.target.getAttribute('data-id');
+    if (confirm('Tem certeza que deseja excluir este usuário?')) {
+        usuarios = usuarios.filter(u => u.id !== id);
+        localStorage.setItem('usuarios', JSON.stringify(usuarios));
+        renderizarUsuarios();
+        mensagemDiv.textContent = 'Usuário excluído com sucesso.';
+    }
+}
+
+// --- CHAMADA INICIAL: Garante que a lista apareça ao carregar a página! ---
+renderizarUsuarios();
+
+
+// --- 3. Scroll suave para links de navegação ---
+
+const navLinks = document.querySelectorAll('#menu ul a'); 
+navLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+        const href = this.getAttribute('href');
+        // Verifica se é um link local para uma seção (ex: #ficha)
+        if (href && href.startsWith('#') && href.length > 1) {
+            e.preventDefault();
+            const target = document.querySelector(href);
+            if (target) {
+                const headerHeight = document.querySelector('header').offsetHeight;
+                const targetPosition = target.offsetTop - headerHeight - 20;
+                window.scrollTo({
+                    top: targetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        }
+    });
+});

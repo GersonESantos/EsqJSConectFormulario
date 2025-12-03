@@ -1,98 +1,136 @@
-const express = require('express');
-const mysql = require('mysql2');
-const cors = require('cors');
-const bodyParser = require('body-parser');
+// --- Lógica CRUD do Formulário ---
 
-const app = express();
-const port = 3000;
+const cadastroForm = document.getElementById('cadastroForm');
+const usuariosContainer = document.getElementById('usuarios-container');
+const mensagemDiv = document.getElementById('mensagem');
+let usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
 
-// Middleware
-app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static('.')); // Serve static files (index.html, style.css, script.js)
+// Função para salvar ou atualizar um usuário
+cadastroForm.addEventListener('submit', function(e) {
+    e.preventDefault();
 
-// Database Connection
-const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'Gabibi89*',
-    port: 3306,
-    database: 'formulario'
+    const idusuarios = document.getElementById('idusuarios').value;
+    const novoUsuario = {
+        id: idusuarios || Date.now().toString(), // Usa ID existente ou novo timestamp
+        nome: document.getElementById('nome').value,
+        email: document.getElementById('email').value,
+        telefone: document.getElementById('telefone').value,
+        sexo: document.getElementById('sexo').value,
+        data_nasc: document.getElementById('data_nasc').value,
+        senha: document.getElementById('senha').value,
+        cidade: document.getElementById('cidade').value,
+        estado: document.getElementById('estado').value,
+        endereco: document.getElementById('endereco').value
+    };
+
+    if (idusuarios) {
+        // Modo Edição: Encontra e substitui o usuário
+        const index = usuarios.findIndex(u => u.id === idusuarios);
+        if (index !== -1) {
+            usuarios[index] = novoUsuario;
+            mensagemDiv.textContent = 'Usuário atualizado com sucesso!';
+        }
+    } else {
+        // Modo Cadastro: Adiciona novo usuário
+        usuarios.push(novoUsuario);
+        mensagemDiv.textContent = 'Usuário cadastrado com sucesso!';
+    }
+    
+    localStorage.setItem('usuarios', JSON.stringify(usuarios));
+    cadastroForm.reset();
+    document.getElementById('idusuarios').value = ''; // Limpa o ID para o próximo cadastro
+    renderizarUsuarios();
 });
 
-db.connect((err) => {
-    if (err) {
-        console.error('Erro ao conectar ao banco de dados:', err);
+// Função para renderizar a lista de usuários
+function renderizarUsuarios() {
+    if (usuarios.length === 0) {
+        usuariosContainer.innerHTML = '<p>Nenhum usuário cadastrado.</p>';
         return;
     }
-    console.log('Conectado ao banco de dados MySQL');
-});
 
-// API Endpoint to create a user
-app.post('/api/usuarios', (req, res) => {
-    const { nome, email, telefone, sexo, data_nasc, senha, cidade, estado, endereco } = req.body;
+    let html = '<table><thead><tr><th>Nome</th><th>Email</th><th>Ações</th></tr></thead><tbody>';
+    
+    usuarios.forEach(usuario => {
+        html += `
+            <tr>
+                <td>${usuario.nome}</td>
+                <td>${usuario.email}</td>
+                <td>
+                    <button class="btn-editar" data-id="${usuario.id}">Editar</button>
+                    <button class="btn-excluir" data-id="${usuario.id}">Excluir</button>
+                </td>
+            </tr>
+        `;
+    });
+    
+    html += '</tbody></table>';
+    usuariosContainer.innerHTML = html;
 
-    const sql = `INSERT INTO usuarios (nome, email, telefone, sexo, data_nasc, senha, cidade, estado, endereco) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-    const values = [nome, email, telefone, sexo, data_nasc, senha, cidade, estado, endereco];
+    // Adiciona event listeners aos novos botões
+    document.querySelectorAll('.btn-editar').forEach(button => {
+        button.addEventListener('click', editarUsuario);
+    });
+    document.querySelectorAll('.btn-excluir').forEach(button => {
+        button.addEventListener('click', excluirUsuario);
+    });
+}
 
-    db.query(sql, values, (err, result) => {
-        if (err) {
-            console.error('Erro ao inserir dados:', err);
-            res.status(500).json({ message: 'Erro ao cadastrar usuário', error: err });
-        } else {
-            console.log('Usuário cadastrado com sucesso:', result);
-            res.status(201).json({ message: 'Usuário cadastrado com sucesso!' });
+// Função de Edição
+function editarUsuario(e) {
+    const id = e.target.getAttribute('data-id');
+    const usuarioParaEditar = usuarios.find(u => u.id === id);
+
+    if (usuarioParaEditar) {
+        // Preenche o formulário com os dados do usuário
+        document.getElementById('idusuarios').value = usuarioParaEditar.id;
+        document.getElementById('nome').value = usuarioParaEditar.nome;
+        document.getElementById('email').value = usuarioParaEditar.email;
+        document.getElementById('telefone').value = usuarioParaEditar.telefone;
+        document.getElementById('sexo').value = usuarioParaEditar.sexo;
+        document.getElementById('data_nasc').value = usuarioParaEditar.data_nasc;
+        document.getElementById('senha').value = usuarioParaEditar.senha;
+        document.getElementById('cidade').value = usuarioParaEditar.cidade;
+        document.getElementById('estado').value = usuarioParaEditar.estado;
+        document.getElementById('endereco').value = usuarioParaEditar.endereco;
+        
+        mensagemDiv.textContent = 'Modo de Edição ativado. Altere os campos e clique em Salvar.';
+    }
+}
+
+// Função de Exclusão
+function excluirUsuario(e) {
+    const id = e.target.getAttribute('data-id');
+    if (confirm('Tem certeza que deseja excluir este usuário?')) {
+        usuarios = usuarios.filter(u => u.id !== id);
+        localStorage.setItem('usuarios', JSON.stringify(usuarios));
+        renderizarUsuarios();
+        mensagemDiv.textContent = 'Usuário excluído com sucesso.';
+    }
+}
+
+// Carregar usuários na inicialização
+renderizarUsuarios();
+
+
+// --- Scroll suave para links de navegação (seu código original, ajustado)
+const navLinks = document.querySelectorAll('#menu ul a'); // Removido .link, já que não estava no HTML
+navLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+        const href = this.getAttribute('href');
+        // Só tenta fazer scroll suave se o href for uma seção local (começa com # e não é apenas '#')
+        if (href && href.startsWith('#') && href.length > 1) {
+            e.preventDefault();
+            const target = document.querySelector(href);
+            if (target) {
+                // Seu cálculo de scroll suave
+                const headerHeight = document.querySelector('header').offsetHeight;
+                const targetPosition = target.offsetTop - headerHeight - 20;
+                window.scrollTo({
+                    top: targetPosition,
+                    behavior: 'smooth'
+                });
+            }
         }
     });
-});
-
-// API Endpoint to list all users
-app.get('/api/usuarios', (req, res) => {
-    const sql = 'SELECT * FROM usuarios';
-    db.query(sql, (err, results) => {
-        if (err) {
-            console.error('Erro ao buscar usuários:', err);
-            res.status(500).json({ message: 'Erro ao buscar usuários', error: err });
-        } else {
-            res.status(200).json(results);
-        }
-    });
-});
-
-// API Endpoint to update a user
-app.put('/api/usuarios/:id', (req, res) => {
-    const { id } = req.params;
-    const { nome, email, telefone, sexo, data_nasc, senha, cidade, estado, endereco } = req.body;
-
-    const sql = `UPDATE usuarios SET nome = ?, email = ?, telefone = ?, sexo = ?, data_nasc = ?, senha = ?, cidade = ?, estado = ?, endereco = ? WHERE idusuarios = ?`;
-    const values = [nome, email, telefone, sexo, data_nasc, senha, cidade, estado, endereco, id];
-
-    db.query(sql, values, (err, result) => {
-        if (err) {
-            console.error('Erro ao atualizar usuário:', err);
-            res.status(500).json({ message: 'Erro ao atualizar usuário', error: err });
-        } else {
-            res.status(200).json({ message: 'Usuário atualizado com sucesso!' });
-        }
-    });
-});
-
-// API Endpoint to delete a user
-app.delete('/api/usuarios/:id', (req, res) => {
-    const { id } = req.params;
-    const sql = 'DELETE FROM usuarios WHERE idusuarios = ?';
-
-    db.query(sql, [id], (err, result) => {
-        if (err) {
-            console.error('Erro ao deletar usuário:', err);
-            res.status(500).json({ message: 'Erro ao deletar usuário', error: err });
-        } else {
-            res.status(200).json({ message: 'Usuário deletado com sucesso!' });
-        }
-    });
-});
-
-app.listen(port, () => {
-    console.log(`Servidor rodando em http://localhost:${port}`);
 });

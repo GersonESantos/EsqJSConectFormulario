@@ -1,19 +1,20 @@
+require('dotenv').config();
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
 
 // Configuração da conexão com o banco de dados
 const dbConfig = {
-    host: 'localhost',
-    user: 'root',
-    password: 'Gabibi89*',
-    port: 3306,
-    database: 'formulario'
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    port: process.env.DB_PORT || 3306,
+    database: process.env.DB_NAME
 };
 
 // Rota para testar a conexão

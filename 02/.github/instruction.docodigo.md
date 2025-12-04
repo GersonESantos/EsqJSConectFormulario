@@ -4,25 +4,8 @@ quero fazer um api para conectar ao banco de dados
 dar a mensagem de sucesso ou erro
 o codigo minimo para fazer isso nao fazer outras funçoes
 stack: JavaScript + HTML + CSS + sql2
-dados do banco de dados:
-    host: 'localhost', 
-    user: 'root',
-    password: 'Gabibi89*',
-    port: 3306,
-    database: 'formulario'
-Table: usuarios
-Columns:
-idusuarios int AI PK 
-nome varchar(45) 
-email varchar(110) 
-telefone varchar(15) 
-sexo varchar(15) 
-data_nasc date 
-senha varchar(45) 
-cidade varchar(45) 
-estado varchar(45) 
-endereco varchar(45)
-    parar aqui para explicar
+
+
 
 css:
 /* 

@@ -17,28 +17,30 @@ const dbConfig = {
     database: process.env.DB_NAME
 };
 
+// Conexão com o banco de dados
+const connection = mysql.createConnection(dbConfig);
+
+connection.connect((err) => {
+    if (err) {
+        console.error('Erro ao conectar ao banco de dados:', err);
+        return;
+    }
+    console.log('Conexão com o banco de dados estabelecida com sucesso!');
+});
+
 // Rota para testar a conexão
 app.get('/api/status', (req, res) => {
-    const connection = mysql.createConnection(dbConfig);
-
-    connection.connect((err) => {
-        if (err) {
-            console.error('Erro ao conectar ao banco de dados:', err);
-            res.status(500).json({
-                status: 'error',
-                message: 'Erro ao conectar ao banco de dados',
-                details: err.message
-            });
-            return;
-        }
-
+    if (connection.state === 'authenticated') {
         res.json({
             status: 'success',
-            message: 'Conexão com o banco de dados estabelecida com sucesso!'
+            message: 'Conexão com o banco de dados já estabelecida!'
         });
-
-        connection.end();
-    });
+    } else {
+        res.status(500).json({
+            status: 'error',
+            message: 'Não foi possível conectar ao banco de dados.'
+        });
+    }
 });
 
 app.listen(port, () => {

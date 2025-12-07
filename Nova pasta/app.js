@@ -1,6 +1,9 @@
+// Importar módulo express
 const express = require('express');
+
 const mysql = require('mysql2');
 
+// App
 const app = express();
 
 // Conexão com o banco de dados
@@ -14,15 +17,15 @@ const Conexao = mysql.createConnection({
 Conexao.connect(function(err){
     if(err) throw err;
     console.log('Conectado com sucesso!');
-});
+}
+);
 
 // Rota de teste
 app.get('/', function(req, res){
+
     res.write('Utilizando MySQL com Node.js');
     res.end();
 });
 
 // Servidor
-app.listen(3000, () => {
-    console.log('Servidor rodando em http://localhost:3000');
-});
+app.listen(8080);

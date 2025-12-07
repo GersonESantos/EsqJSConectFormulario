@@ -1,31 +1,21 @@
-// Importar módulo express
 const express = require('express');
-
 const mysql = require('mysql2');
+const path = require('path'); // Adicionado
 
-// App
 const app = express();
 
-// Conexão com o banco de dados
-const Conexao = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'Gabibi89*',
-    database: 'formulario'
-}); 
-// Conectar
+// ... (código de conexão com o banco, que já sabemos que funciona) ...
 Conexao.connect(function(err){
     if(err) throw err;
     console.log('Conectado com sucesso!');
-}
-);
+});
 
-// Rota de teste
+// Rota principal para servir o index.html
 app.get('/', function(req, res){
-
-    res.write('Utilizando MySQL com Node.js');
-    res.end();
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // Servidor
-app.listen(8080);
+app.listen(3000, () => {
+    console.log('Servidor rodando em http://localhost:3000');
+});

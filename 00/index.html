@@ -1,94 +1,39 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulário de Cadastro</title>
-    <link rel="stylesheet" href="style.css?v=2">
+    <title>Conexão - MySQL formulario</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-    <header>
-        <nav id="menu">
-            <ul>
-                <li><a href="#">Home</a></li>
-                <li><a href="#">Cadastro</a></li>
-            </ul>
-        </nav>
-    </header>
-    <main>
-        <section id="ficha">
-            <h1>Cadastro de Usuário (v2.0)</h1>
-            <form id="cadastroForm">
-                <article>
-                    <h2>Dados Pessoais</h2>
-                    <div style="margin-bottom: 10px;">
-                        <label for="nome">Nome:</label>
-                        <input type="text" id="nome" name="nome" required style="width: 100%; padding: 8px;">
-                    </div>
-                    <div style="margin-bottom: 10px;">
-                        <label for="email">Email:</label>
-                        <input type="email" id="email" name="email" required style="width: 100%; padding: 8px;">
-                    </div>
-                    <div style="margin-bottom: 10px;">
-                        <label for="telefone">Telefone:</label>
-                        <input type="text" id="telefone" name="telefone" style="width: 100%; padding: 8px;">
-                    </div>
-                    <div style="margin-bottom: 10px;">
-                        <label for="sexo">Sexo:</label>
-                        <select id="sexo" name="sexo" style="width: 100%; padding: 8px;">
-                            <option value="Masculino">Masculino</option>
-                            <option value="Feminino">Feminino</option>
-                            <option value="Outro">Outro</option>
-                        </select>
-                    </div>
-                    <div style="margin-bottom: 10px;">
-                        <label for="data_nasc">Data de Nascimento:</label>
-                        <input type="date" id="data_nasc" name="data_nasc" style="width: 100%; padding: 8px;">
-                    </div>
-                    <div style="margin-bottom: 10px;">
-                        <label for="senha">Senha:</label>
-                        <input type="password" id="senha" name="senha" required style="width: 100%; padding: 8px;">
-                    </div>
-                </article>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
 
-                <article>
-                    <h2>Endereço</h2>
-                    <input type="hidden" id="idusuarios" name="idusuarios">
-                    <div style="margin-bottom: 10px;">
-                        <label for="cidade">Cidade:</label>
-                        <input type="text" id="cidade" name="cidade" style="width: 100%; padding: 8px;">
-                    </div>
-                    <div style="margin-bottom: 10px;">
-                        <label for="estado">Estado:</label>
-                        <input type="text" id="estado" name="estado" style="width: 100%; padding: 8px;">
-                    </div>
-                    <div style="margin-bottom: 10px;">
-                        <label for="endereco">Endereço:</label>
-                        <input type="text" id="endereco" name="endereco" style="width: 100%; padding: 8px;">
-                    </div>
-                </article>
+    <main class="glass-container">
+        <header>
+            <h1>Database Connection</h1>
+            <p class="subtitle">MySQL Status Monitor</p>
+        </header>
 
-                <button type="submit"
-                    style="background-color: var(--destaque); color: var(--texto-inverso); padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 1em;">Salvar</button>
-            </form>
-            <div id="mensagem" style="margin-top: 20px; font-weight: bold;"></div>
-        </section>
+        <div class="status-card" id="statusCard">
+            <div class="loader" id="loader"></div>
+            <div class="status-icon hidden" id="statusIcon"></div>
+            <h2 id="statusTitle">Verificando...</h2>
+            <p id="statusMessage">Tentando estabelecer conexão com o banco de dados.</p>
+        </div>
 
-        <section id="lista-usuarios"
-            style="grid-column: 2; background-color: var(--fundo-card); padding: 20px; border-radius: 4px; margin-top: 20px;">
-            <h1>Lista de Usuários</h1>
-            <div id="usuarios-container">
-                <!-- A lista de usuários será carregada aqui -->
-            </div>
-        </section>
-        <p>database: 'formulario'</p>
+        <footer>
+            <button id="retryBtn" class="glass-btn">Testar Novamente</button>
+        </footer>
     </main>
-    <footer>
-        <p>&copy; 2024 Meu Sistema</p>
-    </footer>
-    <script src="script.js?v=2"></script>
-</body>
 
+    <script src="app.js"></script>
+</body>
 </html>

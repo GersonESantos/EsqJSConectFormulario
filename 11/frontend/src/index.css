@@ -28,6 +28,8 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  transform: scale(0.9); /* Reduz a escala de todo o conteúdo em 10% */
+  transform-origin: top center; /* Garante que a escala seja aplicada a partir do topo */
 }
 
 h1 {

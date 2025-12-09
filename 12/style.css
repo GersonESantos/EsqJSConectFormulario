@@ -1,14 +1,34 @@
+/* 
+  Define as variáveis de cor e estilo globais para o projeto. 
+  Usar variáveis CSS (custom properties) permite manter um design consistente 
+  e facilita a alteração de temas e cores em um único lugar.
+*/
 :root {
+    /* Cor de fundo para o efeito "Glassmorphism" (vidro fosco) */
     --glass-bg: rgba(255, 255, 255, 0.1);
+    /* Cor da borda para o efeito de vidro */
     --glass-border: rgba(255, 255, 255, 0.2);
+    /* Sombra projetada pelo container de vidro, dando profundidade */
     --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    /* Cor primária do texto (branco) */
     --text-primary: #ffffff;
+    /* Cor secundária do texto, com leve transparência para hierarquia */
     --text-secondary: rgba(255, 255, 255, 0.7);
+    /* Cor de destaque para mensagens de sucesso */
     --accent-success: #00ff88;
+    /* Cor de destaque para mensagens de erro */
     --accent-error: #ff4d4d;
+    /* Gradiente de fundo para o corpo da página */
     --bg-gradient: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
 }
 
+/*
+  Reset universal e configuração padrão da caixa de modelo.
+  - 'margin: 0' e 'padding: 0' removem espaçamentos padrão do navegador.
+  - 'box-sizing: border-box' faz com que padding e border sejam incluídos na largura/altura total do elemento,
+    facilitando o cálculo de layouts.
+  - 'font-family' define a fonte padrão para toda a página.
+*/
 * {
     margin: 0;
     padding: 0;
@@ -16,6 +36,15 @@
     font-family: 'Outfit', sans-serif;
 }
 
+/*
+  Estilização do corpo (body) da página.
+  - 'min-height: 100vh' garante que o corpo ocupe pelo menos 100% da altura da tela.
+  - 'display: flex' com 'justify-content' e 'align-items' centraliza o conteúdo filho (o .glass-container)
+    tanto horizontalmente quanto verticalmente.
+  - 'background' aplica o gradiente definido nas variáveis.
+  - 'overflow: hidden' impede que as "bolhas" animadas no fundo criem barras de rolagem.
+  - 'color' define a cor de texto padrão.
+*/
 body {
     min-height: 100vh;
     display: flex;
@@ -26,7 +55,11 @@ body {
     color: var(--text-primary);
 }
 
-/* Background Blobs Animation */
+/* 
+  Container para as "bolhas" (blobs) animadas do fundo.
+  - 'position: absolute' o posiciona em relação à página inteira.
+  - 'z-index: -1' o coloca atrás de todo o outro conteúdo.
+*/
 .background-blobs {
     position: absolute;
     top: 0;
@@ -37,6 +70,14 @@ body {
     overflow: hidden;
 }
 
+/*
+  Estilo individual de cada bolha animada.
+  - 'position: absolute' permite posicioná-las livremente dentro do container pai.
+  - 'border-radius: 50%' as torna circulares.
+  - 'filter: blur(80px)' cria o efeito de desfoque suave.
+  - 'opacity: 0.6' as torna semi-transparentes.
+  - 'animation' aplica a animação 'float' para um movimento sutil.
+*/
 .blob {
     position: absolute;
     border-radius: 50%;
@@ -46,17 +87,29 @@ body {
 }
 
 
-
+/*
+  Define a animação 'float'.
+  - 'transform' move e escala as bolhas suavemente entre o início (0%) e o fim (100%) da animação,
+    criando um efeito de flutuação orgânico.
+*/
 @keyframes float {
     0% { transform: translate(0, 0) scale(1); }
     100% { transform: translate(30px, 50px) scale(1.1); }
 }
 
-/* Glass Container */
+/* 
+  Estilo do container principal com efeito de vidro (Glassmorphism).
+  - 'background', 'backdrop-filter', 'border' e 'box-shadow' criam o efeito visual de vidro fosco.
+    'backdrop-filter' é a propriedade chave que desfoca o que está atrás do elemento.
+  - 'border-radius' arredonda os cantos.
+  - 'padding' cria espaçamento interno.
+  - 'width' e 'max-width' controlam o tamanho do container, tornando-o responsivo.
+  - 'animation' aplica a animação 'slideUp' para uma entrada suave na tela.
+*/
 .glass-container {
     background: var(--glass-bg);
     backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px); /* Prefixo para compatibilidade com Safari */
     border: 1px solid var(--glass-border);
     border-radius: 24px;
     padding: 3rem;
@@ -64,11 +117,17 @@ body {
     max-width: 500px;
     box-shadow: var(--glass-shadow);
     text-align: center;
-    transform: translateY(20px);
-    opacity: 0;
+    transform: translateY(20px); /* Posição inicial para a animação */
+    opacity: 0; /* Opacidade inicial para a animação */
     animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
+/*
+  Define a animação 'slideUp'.
+  - Anima o container da posição inicial (deslocado para baixo e transparente)
+    para a posição final (sem deslocamento e totalmente visível).
+  - 'forwards' mantém o estado final da animação.
+*/
 @keyframes slideUp {
     to {
         transform: translateY(0);
@@ -76,57 +135,75 @@ body {
     }
 }
 
+/* Estilização do título principal */
 header h1 {
     font-weight: 600;
     font-size: 2rem;
     margin-bottom: 0.5rem;
-    letter-spacing: -0.5px;
+    letter-spacing: -0.5px; /* Espaçamento entre letras mais justo */
 }
 
+/* Estilização do subtítulo */
 .subtitle {
     color: var(--text-secondary);
     font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 2px;
+    text-transform: uppercase; /* Transforma o texto em maiúsculas */
+    letter-spacing: 2px; /* Aumenta o espaçamento entre letras */
     margin-bottom: 2.5rem;
 }
 
-/* Status Card */
-
+/* Status Card (Cartão de Status) */
+/* Esta seção parece estar vazia, mas seria para estilizar o container que mostra
+   o status de sucesso ou erro após o envio do formulário. */
  
 
+/* Animação de rotação, geralmente usada para ícones de carregamento (spinners) */
 @keyframes rotation {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
 
-/* Status Icons */
+/* 
+  Estilo para os ícones de status (sucesso/erro).
+  - 'font-size' e 'margin-bottom' controlam o tamanho e o espaçamento.
+  - 'animation' aplica a animação 'popIn' para que o ícone "salte" na tela.
+*/
 .status-icon {
     font-size: 3rem;
     margin-bottom: 1rem;
     animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
+/*
+  Define a animação 'popIn'.
+  - Anima o ícone de uma escala zero (invisível) para a escala completa (visível),
+    criando um efeito de surgimento rápido e elástico.
+*/
 @keyframes popIn {
     from { transform: scale(0); opacity: 0; }
     to { transform: scale(1); opacity: 1; }
 }
 
+/* Classe utilitária para esconder elementos da tela. */
 .hidden {
     display: none;
 }
 
+/* Estilo para o título do cartão de status (ex: "Sucesso!") */
 #statusTitle {
     font-size: 1.5rem;
     margin-bottom: 0.5rem;
 }
 
+/* Estilo para a mensagem detalhada no cartão de status */
 #statusMessage {
     color: var(--text-secondary);
     font-size: 0.95rem;
-    line-height: 1.5;
+    line-height: 1.5; /* Altura da linha para melhor legibilidade */
 }
 
-/* Button */
+/* Button (Botão) */
+/* Esta seção também está vazia, mas seria para estilizar os botões do formulário
+   e do cartão de status. */
 
 

@@ -1,0 +1,115 @@
+/* --- Importação de Fonte --- */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* --- Variáveis de Design (Root) --- */
+:root {
+  --font-primary: 'Poppins', sans-serif;
+  
+  /* Cores para o gradiente animado do fundo */
+  --color-background-start: #1a2a6c;
+  --color-background-mid: #b21f1f;
+  --color-background-end: #fdbb2d;
+
+  /* Cores para o efeito de "vidro" */
+  --color-glass-background: rgba(255, 255, 255, 0.1);
+  --color-glass-border: rgba(255, 255, 255, 0.2);
+  
+  /* Cores de texto */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #e0e0e0;
+
+  --border-radius: 12px;
+  --shadow-light: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
+/* --- Reset e Estilos Globais --- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-primary);
+  color: var(--color-text-primary);
+  
+  /* 
+    Passo 1: Criação de um Gradiente
+    O fundo usa as variáveis de cor para criar um gradiente diagonal.
+  */
+  background: linear-gradient(-45deg, var(--color-background-start), var(--color-background-mid), var(--color-background-end));
+  
+  /* 
+    Passo 2: Fundo Gigante
+    O tamanho do fundo é 4x maior para que a animação tenha "espaço" para se mover.
+  */
+  background-size: 400% 400%;
+  
+  /* 
+    Passo 3: Aplicação da Animação
+    A animação 'gradientBG' é aplicada para mover o fundo.
+  */
+  animation: gradientBG 15s ease infinite;
+  
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+/* 
+  Passo 4: Movimentação do Fundo
+  A animação 'gradientBG' move a posição do fundo do canto esquerdo para o direito
+  e de volta, criando o efeito de movimento contínuo.
+*/
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* --- Container de Conteúdo --- */
+.content-container {
+  width: 100%;
+  max-width: 800px;
+  
+  /* Estilo "Glassmorphism" (vidro fosco) */
+  background: var(--color-glass-background);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--color-glass-border);
+  box-shadow: var(--shadow-light);
+  
+  padding: 2.5rem;
+  text-align: center;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.explanation-text {
+  font-size: 1rem;
+  font-weight: 300;
+  color: var(--color-text-secondary);
+  margin-bottom: 2rem;
+  text-align: left;
+  line-height: 1.7;
+}
+
+.explanation-text strong {
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+ol {
+    padding-left: 20px;
+}
+
+li {
+    margin-bottom: 0.5rem;
+}
